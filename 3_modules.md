@@ -63,9 +63,9 @@ Unless otherwise specified, there is one synchronous domain in a `Module` called
 
 There is no reason to create combinatorial domains. As mentioned above, modules already contain one combinatorial domain, `comb`.
 
-You can create a synchronous clock domain using `ClockDomain(domain="<domain-name>", clk_edge="<pos|neg>")`. This gives you both the clock and the reset signal for the domain. By default, the domain name is `sync` and the clock edge is `pos`.
+You can create a synchronous clock domain using `ClockDomain("<domain-name>", clk_edge="<pos|neg>")`. This gives you both the clock and the reset signal for the domain. By default, the domain name is `sync` and the clock edge is `pos`.
 
-You can access a domain via its name. So a domain created via `ClockDomain(domain="other_stuff")` is accessed via `m.d.other_stuff`.
+You can access a domain via its name. So a domain created via `ClockDomain("other_stuff")` is accessed via `m.d.other_stuff`.
 
 You can access this domain's clock via `m.d.other_stuff.clk` and you can access its reset signal via `m.d.other_stuff.rst`.
 
@@ -74,9 +74,44 @@ You can also get the clock and reset signals without access to the domain:
 * `ClockSignal(domain="<domain>")` gives you the clock signal for the given domain.
 * `ResetSignal(domain="<domain>")` gives you the reset signal for the given domain.
 
+Once the domain is created, you can add it to a module's domains by adding it to its `domains`:
+
+```python
+m = Module()
+c = ClockDomain("myclk")
+
+m.domains += c
+```
+
+During elaboration, the domain can then be accessed by its name through the module's `d` dictionary. For the example above, `m.d.myclk`.
+
 ### Tip: clock domains with the same clock but different edges
 
-This can be done simply by creating one `ClockDomain` for the positive edge using and another `ClockDomain` with the same domain name but with `clk_edge="neg"`.
+This can be done simply by creating one `ClockDomain` for the positive edge, and then creating another `ClockDomain` with the same domain name but with `clk_edge="neg"`:
+
+```python
+pos = ClockDomain("pos")
+neg = ClockDomain("pos", clk_edge="neg")
+
+m.domains += pos
+m.domains.neg = neg # Important!
+```
+
+That last statement overrides the key for the domain in the module's `d` dictionary. Instead of the key being `pos`, which would simply overwrite the previous addition, we explicitly set the key to `neg`. Another way of accomplishing this is to use an unrelated name for the clocks:
+
+```python
+pos = ClockDomain("clk")
+neg = ClockDomain("clk", clk_edge="neg")
+
+m.domains.pos = pos
+m.domains.neg = neg
+```
+
+### Access to domains
+
+As stated above, a module can access its domains via its `d` attribute. By default, if a synchronous domain is added to a module's `domains` attribute, then all modules everywhere will also have access to that domain via their `d` attribute, even if that module is not a submodule of the module where the domain was added
+
+You can explicitly inhibit this global propagation by setting the `local` named parameter of the `ClockDomain` to `True`. This forces the clock to only be present in the domain of the module it was added to, and all submodules of that module.
 
 ## Ports
 
