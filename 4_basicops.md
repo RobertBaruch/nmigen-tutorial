@@ -58,23 +58,23 @@ Python's integers are of potentially infinite bit width. In keeping with this ph
 >>> s2 = Signal(4)
 >>> v = s1 + s2
 >>> v.shape()
-(width=5, shape=False)
+(width=5, signed=False)
 >>>
 ```
 
-The same happens when adding two 5-bit 2's complement signals. The range of each operand is -16 to +15, so the range of the result is -32 to 30, which means that adding two 5-bit 2's complement signals yields a 6-bit 2's complement signal.
+The same happens when adding two 5-bit 2's complement signals. The range of each operand is -16 to +15, so the range of the result is -32 to 30, which means that adding two 5-bit 2's complement signals yields a 6-bit 2's complement signal. This is an important point to keep in mind, since it will affect comparisons. We will see how to deal with this later.
 
 ## Placing statements in domains
 
 Statements are written in the combinatorial domain of a module, or in a sequential domain (clock domain) of a module. The equivalent in Verilog is continuous assignment and clocked assignment.
 
-So if you have a module `m`, you can add a statement that `x` gets the value of `y+1` all the time like:
+So if you have a module `m`, you can add a statement that `x` gets the value of `y+1` all the time like this:
 
 ```python
 m.d.comb += x.eq(y+1)
 ```
 
-On the other hand, if you have a clock domain `sync` that is clocked on the positive edge, then you can add a statement that `x` gets the value of `y+1` on the positive edge of the clock of `sync` like:
+On the other hand, if you have a clock domain `sync` that is clocked on the positive edge, then you can add a statement that `x` gets the value of `y+1` on the positive edge of the clock of `sync` like this:
 
 ```python
 m.d.sync += x.eq(y+1)
@@ -101,3 +101,10 @@ m.d.comb += x.eq(y+2)
 ```
 
 In this case, `x` will get `y+2`.
+
+Remember that a signal cannot be set in two different domains so this will result in an error:
+
+```python
+m.d.comb += x.eq(y+1)
+m.d.sync += x.eq(y+2)
+```
