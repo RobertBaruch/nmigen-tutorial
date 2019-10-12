@@ -8,4 +8,4 @@ WORK IN PROGRESS
 3. [Modules](3_modules.md)
 4. [Basic operations](4_basicops.md)
 5. [Branching](5_branching.md)
-6. [Combining](6_combining.md)
+6. [Splitting and combining signals](6_combining.md)

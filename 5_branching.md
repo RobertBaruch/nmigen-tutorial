@@ -2,7 +2,7 @@
 
 Just as in the standard HDLs, it is possible to use conditional logic.
 
-## if-elif-else
+## If-Elif-Else
 
 You cannot use the standard Python `if-elif-else` statements to create statements. Instead, we use the following `with` constructs:
 
@@ -28,13 +28,13 @@ If `platform` is `"this"` then only `statement1` will appear in the generated ha
 
 ### Conditions
 
-The conditions in `if-elif-else` are comparisons, for example `a == 1` or `(a >= b) & (a <= c)`. Note that in this latter example, we used parentheses around each term. Each comparison, in essense, becomes a one-bit signal, and `&` is a _bit-wise operator_, not the logical `and`. When in doubt, just use parentheses.
+The conditions in `If-Elif-Else` are comparisons, for example `a == 1` or `(a >= b) & (a <= c)`. Note that in this latter example, we used parentheses around each term. Each comparison, in essense, becomes a one-bit signal, and `&` is a _bit-wise operator_, not the logical `and`. When in doubt, just use parentheses.
 
 If you have a signal with more than one bit and use it as the condition, as in `with m.If(a):`, then the condition will be true if any bit in `a` is 1.
 
-## switch-case-default
+## Switch-Case-Default
 
-You can use `switch-case-default` just as in standard HDLs using the following `with` constructs:
+You can use `Switch-Case-Default` just as in standard HDLs using the following `with` constructs:
 
 ```python
 with m.Switch(expression):
@@ -50,7 +50,7 @@ with m.Switch(expression):
 
 The way to specify matching a pattern in a `Case` is with a Python string of binary digits. For example, `"0011101011"`. A don't-care bit is specified using a dash, so for example `"001---101"`. The number of bits in the string must exactly match the number of bits in the expression it is being compared to.
 
-A `Value` has a method `matches` which acts like a `switch-case`. For example:
+A `Value` has a method `matches` which acts like a `Switch-Case`. For example:
 
 ```python
 with m.If(a.matches("11---", 3, b)):

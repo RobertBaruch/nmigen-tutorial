@@ -64,6 +64,18 @@ Python's integers are of potentially infinite bit width. In keeping with this ph
 
 The same happens when adding two 5-bit 2's complement signals. The range of each operand is -16 to +15, so the range of the result is -32 to 30, which means that adding two 5-bit 2's complement signals yields a 6-bit 2's complement signal. This is an important point to keep in mind, since it will affect comparisons. We will see how to deal with this later.
 
+## Multiplexing signals
+
+`Mux` returns one signal if the condition is true, the other signal otherwise:
+
+```python
+y.eq(Mux(cond, x1, x2))
+```
+
+In this case, if `cond` is true then `y` is set to `x1`, otherwise `x2`.
+
+`Mux` cannot be used on the left-hand side of an assignment.
+
 ## Placing statements in domains
 
 Statements are written in the combinatorial domain of a module, or in a sequential domain (clock domain) of a module. The equivalent in Verilog is continuous assignment and clocked assignment.

@@ -7,10 +7,7 @@ Install:
   * sudo -H pip3 install --upgrade pip
   * sudo apt install python3.6-dev 
 
-* yosys
-* Symbiyosys
-* yices2
-* boolector
+* yosys, Symbiyosys, yices2, boolector
 
 Follow the [instructions to install these](https://symbiyosys.readthedocs.io/en/latest/quickstart.html). It is highly recommended to follow those instructions, especially for yosys since the git repo has many more fixes than the official release.
 

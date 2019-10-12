@@ -61,3 +61,15 @@ True
 ```
 
 Again, note that `signed(4)` gives you a 4-bit 2's complement signal which can represent anything from -8 to +7. If you meant to get a Signal that is 4 bits plus a sign in order to represent -16 to +15, then you need `signed(5)`.
+
+### Signal.range
+
+Just like `Const(10)` creates a value large enough to hold the integer 10, `Signal.range(11)` creates an unsigned signal large enough to hold any integer between 0 and 10 inclusive, which in Python is `range(11)`.
+
+If the range contains a negative number, then the signal will be signed: `Signal.range(-5, 11)` holds any value between -5 and +10 inclusive, which makes it a 2's complement 5-bit signal:
+
+```python
+>>> x = Signal.range(-5, 11)
+>>> x.shape()
+Shape(width=5, signed=True)
+```
