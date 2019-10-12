@@ -31,7 +31,7 @@ if __name__ == "__main__":
     main(m, ports=[sync.clk, sync.rst])
 ```
 
-* `main(module, ports=[<ports>], platform="<platform>")` translates the given module, including any submodules recursively, in either Verilog or RTLIL. All `elaborate()` methods will have its `platform` argument set to the given `platform`. Elaboratables might create different logic for different platforms.
+* `main(module, ports=[<ports>], platform="<platform>")` translates the given module, including any submodules recursively, in either Verilog or RTLIL. This is called _elaboration_. All `elaborate()` methods will have its `platform` argument set to the given `platform`. Elaboratables might create different logic for different platforms.
 
 ```
 python3 thing.py generate -t [v|il]
@@ -39,7 +39,7 @@ python3 thing.py generate -t [v|il]
 
 ## Domains
 
-A _domain_, in its basic definition, is a grouping of logic elements. If we consider a module as a black box with inputs and outputs, then any given output is generated within one and only one domain. If you attempt to set an output in more than one domain, you'll get an error.
+A _domain_, in its basic definition, is a grouping of logic elements. If we consider a module as a black box with inputs and outputs, then any given output is generated within one and only one domain. If you attempt to set an output in more than one domain, you'll get an error during elaboration that the signal has more than one driver.
 
 `Modules` come with two domains built in: a combinatorial domain and a synchronous domain.
 
@@ -95,3 +95,25 @@ class ThingBlock(Elaboratable):
 
         return m
 ```
+
+## Reset/default values for signals
+
+If a signal is set in the _combinatorial_ domain, then you can specify the default value of the signal if it is not set. By default, this is zero, but for a non-zero value, you can specify the default value for a signal when constructing the signal by setting the `reset` named parameter in the constructor. For example, this creates a 16-bit unsigned signal, `self.x`, which defaults to `0x1000` if not set:
+
+```python
+self.x = Signal(unsigned(16), reset=0x1000) # Yes, reset.
+```
+
+Likewise, if a signal is set in a _synchronous_ domain, then you can specify its reset value using the `reset` named parameter in the constructor. By default the reset value is zero.
+
+### Explicitly not resetting
+
+For synchronous signals (that is, signals set in a synchronous domain), you can specify that it is not reset on the reset signal, instead only getting an _initial value_ on power-up. This is done by setting the `reset_less` named parameter in the constructor to `True`:
+
+```python
+self.x = Signal(unsigned(16), reset=0x1000, reset_less=True)
+```
+
+This would create a 16-bit unsigned signal that is initially set to `0x1000`, but is not reset to that value when the domain's reset signal is activated.
+
+This is especially useful during simulation or formal verification where you want to activate the reset, but keep some signals "outside" the reset. For example, a cycle counter that maintains its count across resets.
