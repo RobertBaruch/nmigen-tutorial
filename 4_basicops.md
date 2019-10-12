@@ -1,23 +1,5 @@
 # Basic operations
 
-## Ports
-
-The equivalent of ports in a module is public attributes. In the following example, `a` and `data` are publically available to other modules, while `b` is not, just as `a` and `data` are publically available to other Python classes, and `b` is not.
-
-```python
-class ThingBlock(Elaboratable):
-    def __init__(self):
-        self.a = Signal()
-        self.data = Signal(8)
-
-    def elaborate(self, platform: str):
-        m = Module()
-
-        b = Signal()
-
-        return m
-```
-
 ## Statements
 
 nMigen doesn't convert Python to hardware. In essence, what you are writing using nMigen is a _generator_ of logic, not the logic itself. So if you want one `Value` to take the value of another, you don't write `a = b`, but instead you call the method of `a` that generates the equality: `a.eq(b)`. This is known as a _statement_.

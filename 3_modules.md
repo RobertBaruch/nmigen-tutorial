@@ -21,8 +21,6 @@ from nmigen.cli import main
 
 if __name__ == "__main__":
     sync = ClockDomain()
-    clk = ClockSignal()
-    rst = ResetSignal()
 
     block = ThingBlock()
 
@@ -30,7 +28,7 @@ if __name__ == "__main__":
     m.domains += sync
     m.submodules += block
 
-    main(m, ports=[clk, rst])
+    main(m, ports=[sync.clk, sync.rst])
 ```
 
 * `main(module, ports=[<ports>], platform="<platform>")` translates the given module, including any submodules recursively, in either Verilog or RTLIL. All `elaborate()` methods will have its `platform` argument set to the given `platform`. Elaboratables might create different logic for different platforms.
@@ -69,9 +67,31 @@ You can create a synchronous clock domain using `ClockDomain(domain="<domain-nam
 
 You can access a domain via its name. So a domain created via `ClockDomain(domain="other_stuff")` is accessed via `m.d.other_stuff`.
 
+You can access this domain's clock via `m.d.other_stuff.clk` and you can access its reset signal via `m.d.other_stuff.rst`.
+
+You can also get the clock and reset signals without access to the domain:
+
 * `ClockSignal(domain="<domain>")` gives you the clock signal for the given domain.
 * `ResetSignal(domain="<domain>")` gives you the reset signal for the given domain.
 
 ### Tip: clock domains with the same clock but different edges
 
 This can be done simply by creating one `ClockDomain` for the positive edge using and another `ClockDomain` with the same domain name but with `clk_edge="neg"`.
+
+## Ports
+
+The equivalent of ports in a module is public attributes. In the following example, `a` and `data` are publically available to other modules, while `b` is not, just as `a` and `data` are publically available to other Python classes, and `b` is not.
+
+```python
+class ThingBlock(Elaboratable):
+    def __init__(self):
+        self.a = Signal()
+        self.data = Signal(8)
+
+    def elaborate(self, platform: str):
+        m = Module()
+
+        b = Signal()
+
+        return m
+```
