@@ -58,27 +58,11 @@ Python's integers are of potentially infinite bit width. In keeping with this ph
 >>> s2 = Signal(4)
 >>> v = s1 + s2
 >>> v.shape()
-(5, False)
+(width=5, shape=False)
 >>>
 ```
 
-The same happens when adding two signed 4-bit signals. The range of each operand is -15 to +15, so the range of the result is -30 to 30.
-
-However, adding a signed 16-bit signal to an unsigned 16-bit signal will result in an _18-bit_ signal:
-
-```python
->>> s1 = Signal((16, True))
->>> s2 = Signal(16)
->>> (s1+s2).shape()
-(18, True)
->>>
-```
-
-This is, perhaps, surprising. Consider a 4-bit signal. If unsigned, its representation is simply four bits. However, if signed, then it should be able to hold any integer from -15 to +15. This takes 5 bits in 2's complement: `10000` to `00000` to `01111`. Adding an unsigned 4-bit number adds as little as 0 to the range, and as much as 15. Thus the range of the result is -15 to +30. This is as good as -30 to +30, which is as good as -31 to +31, which in 2's complement is `100000` to `000000` to `011111`, or 6 bits.
-
-The rules of result width are:
-* A signed operand has its effective length increased by one (due negative numbers being represented as 2's complement).
-* A result is as long as it needs to be for the largest possible positive or negative result.
+The same happens when adding two 5-bit 2's complement signals. The range of each operand is -16 to +15, so the range of the result is -32 to 30, which means that adding two 5-bit 2's complement signals yields a 6-bit 2's complement signal.
 
 ## Placing statements in domains
 

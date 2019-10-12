@@ -12,7 +12,7 @@ But how does nMigen know how many bits the value has? If you simply construct a 
 
 You can specify that the value is signed, which affects things like magnitude comparisons. `a = Const(-10)` will automatically create a signed value. But `a = Const(10, signed(16))` explicitly creates a 16-bit signed value.
 
-Note that signed values are 2's complement values. `Const(-10)` is a 5-bit value, because the minimum representation of `-10` in 2's complement is `11010`.
+Note that signed values are 2's complement values. `Const(-10)` is a _5-bit value_, because the minimum representation of `-10` in 2's complement is `11010`.
 
 You can also retrieve the shape of a `Const`:
 
@@ -42,7 +42,7 @@ True
 
 A `Signal` is a value that does change. Signals may be implemented as flipflops or wires. The backend will figure it out based on how they are used. It's the equivalent of `wire`, `reg`, or `logic` in Verilog.
 
-Just like a `Const`, a `Signal` has a shape: a width and a signedness. You can create a 16-bit unsigned `Signal`, for example, by `a = Signal(16)` or `a = Signal(unsigned(16))`. You can specify a signed `Signal` via `a = Signal(signed(16))`.
+Just like a `Const`, a `Signal` has a shape: a width and a signedness. You can create a 16-bit unsigned `Signal`, for example, by `a = Signal(16)` or `a = Signal(unsigned(16))`. You can specify a signed 16-bit `Signal` via `a = Signal(signed(17))` -- you need the extra bit for the sign.
 
 If you don't specify a shape at all: `a = Signal()`, the shape of such a `Signal` is one bit, unsigned.
 
@@ -50,12 +50,14 @@ Again, like with `Const`, you can retrieve the shape of a `Signal`:
 
 ```python
 >>> from nmigen import *
->>> a = Signal(signed(16))
+>>> a = Signal(signed(4))
 >>> a.shape()
-(width=16, signed=True)
+(width=4, signed=True)
 >>> a.width
-16
+4
 >>> a.signed
 True
 >>>
 ```
+
+Again, note that `signed(4)` gives you a 4-bit 2's complement signal which can represent anything from -8 to +7. If you meant to get a Signal that is 4 bits plus a sign in order to represent -16 to +15, then you need `signed(5)`.
