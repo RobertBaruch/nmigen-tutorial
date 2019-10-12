@@ -38,7 +38,7 @@ However, many math operators are overridable in Python, since these translate to
 | `<<`     | shift right              |
 | `>>`     | shift left               | Logical, not arithmetic          |
 | `&`      | bitwise and              |
-| `|`      | bitwise or               |
+| `\|`     | bitwise or               |
 | `^`      | bitwise xor              |
 | `==`     | equality                 |
 | `>`      | greater than             |
