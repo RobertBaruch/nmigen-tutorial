@@ -9,3 +9,4 @@ WORK IN PROGRESS
 4. [Basic operations](4_basicops.md)
 5. [Branching](5_branching.md)
 6. [Splitting and combining signals](6_combining.md)
+7. [Simulation using yosys](7_simulating.md)
