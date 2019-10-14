@@ -14,3 +14,6 @@ Follow the [instructions to install these](https://symbiyosys.readthedocs.io/en/
 * nMigen
   * pip3 install --user git+https://github.com/m-labs/nmigen.git
 
+* For simulation
+  * [gtkwave](https://sourceforge.net/projects/gtkwave/)
+  
