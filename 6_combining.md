@@ -217,3 +217,121 @@ z = y[i % 4]
 This isn't great because it can still lead to surprising results.
 
 In the end, you will have to *formally verify* that `i` will only contain valid values. We will talk about formal verification extensively in later sections.
+
+## Records
+
+A `Record` is a bundle of signals. To define a `Record`, we first must define a `Layout`.
+
+### Layouts
+
+```python
+from nmigen.hdl.rec import *
+
+class MyLayout(Layout):
+    def __init__(self):
+        super().__init__([
+            (<signal-name>, <shape|layout> [, <direction>]),
+            (<signal-name>, <shape|layout> [, <direction>]),
+            ...
+        ])
+```
+
+Here is an example of a bus with 8 data bits, 16 address bits, and some control signals:
+
+```python
+class BusLayout(Layout):
+    def __init__(self):
+        super().__init__([
+            ("data", unsigned(8)),
+            ("addr", unsigned(16))
+            ("wr", 1),
+            ("en", 1),
+        ])
+```
+
+A signal in a layout can have its shape be a layout:
+
+```python
+class DataBusLayout(Layout):
+    def __init__(self):
+        super().__init__([
+            ("data", unsigned(8)),
+        ])
+
+class AddrBusLayout(Layout):
+    def __init__(self):
+        super().__init__([
+            ("addr", unsigned(16)),
+        ])
+
+class AllBusLayout(Layout):
+    def __init__(self):
+        super().__init__([
+            ("addr_bus", AddrBusLayout()),
+            ("data_bus", DataBusLayout()),
+        ])
+```
+
+### Laying out a Record with a Layout
+
+Once a `Layout` is defined, you can define a `Record` using that `Layout`, and use it as a signal:
+
+```python
+class Bus(Record):
+    def __init__(self):
+        super().__init__(BusLayout())
+
+...
+
+# Later, in a Module:
+    self.bus = Bus()
+    m.d.comb += self.bus.data.eq(0xFF)
+    m.d.sync += self.bus.wr.eq(0)
+
+# You can even operate on the entire record:
+    self.bus2 = Bus()
+    m.d.comb += self.bus2.eq(self.bus)
+```
+
+### Directions and connecting records
+
+It is often advantageous to define signals so that the zero value means either invalid or inactive. That way, you can have many of those signals and logical-or them together. So for example, you might have three modules, each of which output a one-bit `write` signal, but only one module will write at a time. Then if your `write` signal is active high (so zero means no write), you can simply logical-or the `write` signals from each module together to get a master `write` signal.
+
+As another example, each module could output 8 bits of data, but only one module at a time would send data to the data bus. In this case, if a module is inactive, it should output 0 on its `data` port. The value of the data bus is then just the values of all modules' `data` ports, logical-ored together.
+
+This method of "connecting" signals together is called _fan-in_. If the direction of each signal in a record's layout is `DIR_FANIN`, then you can connect several records to a "master" record like this:
+
+```python
+    self.master_record = Bus()
+    m.d.comb += self.master_record.connect(bus1, bus2, bus3, ...)
+```
+
+The `connect` method on a record returns an array of statements which logical-ors each signal together. The exact same thing could be accomplished "manually" by operating on the entire record:
+
+```python
+    self.master_record = Bus()
+    m.d.comb += self.master_record.eq(bus1 | bus2 | bus3 | ...)
+```
+
+The disadvantage is that `connect` can connect _parts_ of records, if the field names match. In this sense, the "subordinate" records must have every signal that the "master" record has. That is, the "subordinate" records can have extra signals, but the "master" record must not.
+
+_Fan-out_ is where each subordinate record gets a copy of the master record. If the direction of each signal in a record's layout is `DIR_FANOUT`, then you can connect several records to a "master" record like this:
+
+```python
+    self.master_record = Bus()
+    m.d.comb += self.master_record.connect(bus1, bus2, bus3, ...)
+```
+
+The syntax is exactly the same, but the direction is different, from master record to each subordinate record. Again, you could do this "manually":
+
+```python
+    self.master_record = Bus()
+    m.d.comb += [
+        bus1.eq(self.master_record),
+        bus2.eq(self.master_record),
+        bus3.eq(self.master_record),
+        ...
+    ]
+```
+
+But this is longer, and also doesn't handle when the master record has extra signals not in the subordinate records.

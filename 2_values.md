@@ -77,7 +77,7 @@ This is the equivalent of finding the minimum and maximum value of the enum, and
 
 The enumerated values of the enum can be used anywhere a `Const` can be used, so that `Func.SUB` is equivalent to `Const(2, range(0, 5))`.
 
-## Signal
+## Signals
 
 A `Signal` is a value that does change. Signals may be implemented as flipflops or wires. The backend will figure it out based on how they are used. It's the equivalent of `wire`, `reg`, or `logic` in Verilog.
 
@@ -133,3 +133,17 @@ x = Signal.enum(Func)
 
 Again, as with `Const`, this is the equivalent of finding the minimum and maximum value of the enum, and then using that as the range for the signal. In the example above, it would be the same as `Signal.range(0, 5)`.
 
+### Signal names
+
+The name of a signal can be explicitly specified via the `name` named argument in its constructor. If you leave out the name, the name will be inferred from the variable it is assigned to, if possible.
+
+```python
+>>> x = Signal(unsigned(16))
+>>> x.name
+'x'
+>>> x = Signal(unsigned(16), name="addr")
+>>> x.name
+'addr'
+```
+
+At elaborate time, if the name collides with an existing name, a new name will be chosen using prefixes and suffixes.
