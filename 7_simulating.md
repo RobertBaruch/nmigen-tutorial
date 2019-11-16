@@ -292,6 +292,8 @@ $ gtkwave <module>_cover/engine_0/trace0.vcd
 
 If you have more than one clock, and they are related, you can trigger them off of a master clock. Here is a full example showing how to set up your clocks. There is also a cover statement to show how the system gets to a particular state.
 
+Suppose we have a two-clock system where synchronous actions happen on the positive edge of phase 1 and on the negative edge of phase 2.
+
 ```python
 from nmigen import *
 from nmigen.cli import main
@@ -321,14 +323,14 @@ if __name__ == "__main__":
     # ph2: |`|_____|`|_____|`|_____|`|___
     #
     # phase:  0 1 2 3 0 1 2 3 0 1 2 3
+    #
+    # We want the system to perform actions on
+    # the positive edge of ph1, and the negative
+    # edge of ph2.
 
-    # Define a master clock which controls the other clocks
-    clk = Signal()
+    # The "master clock" already exists in nMigen. The
+    # domain is named "sync" and its clock is named "clk".
     rst = Signal(reset=1, reset_less=True)
-    master_clk = ClockDomain()
-    master_clk.clk = clk
-    master_clk.rst = rst
-    m.domains += master_clk
 
     # Define the two clocks
     clk1 = Signal(reset=0, reset_less=True)
@@ -343,7 +345,12 @@ if __name__ == "__main__":
     ph2.rst = rst
     m.domains += ph2
 
-    # Count out four phases
+    # Count out four phases and set the two clocks so
+    # that they look right. Without this, yosys is free
+    # to align the edges of the clocks however it wants.
+    # You might think, therefore, that some Assumes are
+    # all we need here, but apparently not. Perhaps yosys
+    # ignores Assume statements with clocks in them.
     phase = Signal(2, reset=0, reset_less=True)
     m.d.sync += phase.eq(phase + 1)
     m.d.sync += clk1.eq(phase == 1)
@@ -363,3 +370,5 @@ if __name__ == "__main__":
 
     main(m, ports=[clk, rst, clk1, clk2, testcase.ph1_val, testcase.ph2_val])
 ```
+
+Notice that if we don't care so much about seeing the phase 1 and phase 2 clocks, we can simply go with one clock, and perform synchronous actions on both positive and negative edges as above. Simulation and formal verification would run twice as fast because you only have two clock states instead of four. However, you wouldn't see the lopsided effect of the timing.
