@@ -371,4 +371,97 @@ if __name__ == "__main__":
     main(m, ports=[clk, rst, clk1, clk2, testcase.ph1_val, testcase.ph2_val])
 ```
 
-Notice that if we don't care so much about seeing the phase 1 and phase 2 clocks, we can simply go with one clock, and perform synchronous actions on both positive and negative edges as above. Simulation and formal verification would run twice as fast because you only have two clock states instead of four. However, you wouldn't see the lopsided effect of the timing.
+Notice that if we don't care so much about seeing the phase 1 and phase 2 clocks, we can simply go with one clock, and perform synchronous actions on both positive and negative edges as above. Simulation and formal verification would run _four times as fast_ because there will be one tick of the global clock per action instead of four. However, you wouldn't see the lopsided effect of the timing. Here's a version of the above file that defines a `GOFASTER` flag.
+
+```python
+from nmigen import *
+from nmigen.cli import main
+from nmigen.asserts import *
+
+GOFASTER = 1
+
+class TestCase(Elaboratable):
+    def __init__(self):
+        self.ph1_val = Signal(4)
+        self.ph2_val = Signal(4)
+
+    def elaborate(self, platform):
+        m = Module()
+        m.d.ph1 += self.ph1_val.eq(self.ph1_val + 1)
+        m.d.ph2 += self.ph2_val.eq(self.ph2_val + 1)
+        return m
+
+
+if __name__ == "__main__":
+    m = Module()
+    testcase = TestCase()
+
+    # Two clocks, out of phase:
+    #
+    # ph1: ____|`|_____|`|_____|`|___
+    #
+    # ph2: |`|_____|`|_____|`|_____|`|___
+    #
+    # phase:  0 1 2 3 0 1 2 3 0 1 2 3
+    #
+    # We want the system to perform actions on
+    # the positive edge of ph1, and the negative
+    # edge of ph2.
+
+    # The "master clock" already exists in nMigen. The
+    # domain is named "sync" and its clock is named "clk".
+    rst = Signal(reset=1, reset_less=True)
+
+    # Define the two clocks
+    if GOFASTER:
+        clk1 = Signal(reset=0, reset_less=True)
+        ph1 = ClockDomain()
+        ph1.clk = clk1
+        ph1.rst = rst
+        m.domains += ph1
+
+        clk2 = clk1
+        ph2 = ClockDomain(clk_edge="neg")
+        ph2.clk = clk2
+        ph2.rst = rst
+        m.domains += ph2
+    else:
+        clk1 = Signal(reset=0, reset_less=True)
+        ph1 = ClockDomain("ph1")
+        ph1.clk = clk1
+        ph1.rst = rst
+        m.domains += ph1
+
+        clk2 = Signal(reset=0, reset_less=True)
+        ph2 = ClockDomain("ph2", clk_edge="neg")
+        ph2.clk = clk2
+        ph2.rst = rst
+        m.domains += ph2
+
+    phase = Signal(2, reset=0, reset_less=True)
+    if GOFASTER == 0:
+        # Count out four phases and set the two clocks so
+        # that they look right. Without this, yosys is free
+        # to align the edges of the clocks however it wants.
+        # You might think, therefore, that some Assumes are
+        # all we need here, but apparently not. Perhaps yosys
+        # ignores Assume statements with clocks in them.
+        phase.attrs["keep"] = 1
+        m.d.sync += phase.eq(phase + 1)
+        m.d.comb += clk1.eq(phase == 1)
+        m.d.comb += clk2.eq(phase == 3)
+
+    m.submodules += testcase
+
+    # Cycle counter
+    cycle = Signal(unsigned(8), reset_less=True)
+    m.d.sync += cycle.eq(cycle + 1)
+
+    # Force a reset at the beginning
+    with m.If(cycle < 4):
+        m.d.comb += Assume(rst)
+
+    m.d.comb += Cover((testcase.ph1_val == 4) & (testcase.ph2_val == 4))
+
+    main(m, ports=[clk, rst, clk1, clk2, testcase.ph1_val, testcase.ph2_val])
+```
