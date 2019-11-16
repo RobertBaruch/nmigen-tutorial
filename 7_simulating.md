@@ -446,7 +446,6 @@ if __name__ == "__main__":
         # You might think, therefore, that some Assumes are
         # all we need here, but apparently not. Perhaps yosys
         # ignores Assume statements with clocks in them.
-        phase.attrs["keep"] = 1
         m.d.sync += phase.eq(phase + 1)
         m.d.comb += clk1.eq(phase == 1)
         m.d.comb += clk2.eq(phase == 3)
