@@ -10,19 +10,19 @@ The best way to simulate a module is through the use of yosys. In brief:
 6. Set up a `Cover` statement to cover the case where the cycle count is high enough.
 7. Set up an `sby` file.
 8. Generate RTLIL for the top-level module:
-   
+
    ```
    $ python3 toplevel.py generate -t il > toplevel.il
    ```
 9. Run Symbiyosys on the output:
-   
+
    ```
    $ sby -f toplevel.sby
    ```
-   
+
    Symbiyosys should run, incrementing the cycle count.
 10. View the output with `gtkwave`.
-    
+
 ## 1. Top-level module
 
 Define a ports function in your module which returns an array of your module's ports:
@@ -243,7 +243,7 @@ toplevel.il
 ```
 
 ## 8. Generate RTLIL for the top-level module:
-   
+
 ```
 $ python3 toplevel.py generate -t il > toplevel.il
 ```
@@ -288,3 +288,78 @@ $ gtkwave <module>_cover/engine_0/trace0.vcd
 
 ![trace](trace.png "gtkwave trace")
 
+# Dealing with more complex clocks
+
+If you have more than one clock, and they are related, you can trigger them off of a master clock. Here is a full example showing how to set up your clocks. There is also a cover statement to show how the system gets to a particular state.
+
+```python
+from nmigen import *
+from nmigen.cli import main
+from nmigen.asserts import *
+
+
+class TestCase(Elaboratable):
+    def __init__(self):
+        self.ph1_val = Signal(4)
+        self.ph2_val = Signal(4)
+
+    def elaborate(self, platform):
+        m = Module()
+        m.d.ph1 += self.ph1_val.eq(self.ph1_val + 1)
+        m.d.ph2 += self.ph2_val.eq(self.ph2_val + 1)
+        return m
+
+
+if __name__ == "__main__":
+    m = Module()
+    testcase = TestCase()
+
+    # Two clocks, out of phase:
+    #
+    # ph1: ____|`|_____|`|_____|`|___
+    #
+    # ph2: |`|_____|`|_____|`|_____|`|___
+    #
+    # phase:  0 1 2 3 0 1 2 3 0 1 2 3
+
+    # Define a master clock which controls the other clocks
+    clk = Signal()
+    rst = Signal(reset=1, reset_less=True)
+    master_clk = ClockDomain()
+    master_clk.clk = clk
+    master_clk.rst = rst
+    m.domains += master_clk
+
+    # Define the two clocks
+    clk1 = Signal(reset=0, reset_less=True)
+    ph1 = ClockDomain("ph1")
+    ph1.clk = clk1
+    ph1.rst = rst
+    m.domains += ph1
+
+    clk2 = Signal(reset=0, reset_less=True)
+    ph2 = ClockDomain("ph2", clk_edge="neg")
+    ph2.clk = clk2
+    ph2.rst = rst
+    m.domains += ph2
+
+    # Count out four phases
+    phase = Signal(2, reset=0, reset_less=True)
+    m.d.sync += phase.eq(phase + 1)
+    m.d.sync += clk1.eq(phase == 1)
+    m.d.sync += clk2.eq(phase == 3)
+
+    m.submodules += testcase
+
+    # Cycle counter
+    cycle = Signal(unsigned(8), reset_less=True)
+    m.d.sync += cycle.eq(cycle + 1)
+
+    # Force a reset at the beginning
+    with m.If(cycle < 4):
+        m.d.comb += Assume(rst)
+
+    m.d.comb += Cover((testcase.ph1_val == 4) & (testcase.ph2_val == 4))
+
+    main(m, ports=[clk, rst, clk1, clk2, testcase.ph1_val, testcase.ph2_val])
+```
