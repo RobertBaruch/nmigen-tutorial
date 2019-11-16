@@ -58,7 +58,7 @@ if __name__ == "__main__":
     m.domains += sync
     m.submodules.yourmodule = yourmodule
 
-    main(m, ports=[clk, rst] + yourmodule.ports)
+    main(m, ports=[clk, rst] + yourmodule.ports())
 
 
 #
@@ -84,7 +84,7 @@ if __name__ == "__main__":
     m.domains.neg = neg
     m.submodules.yourmodule = yourmodule
 
-    main(m, ports=[clk, rst] + yourmodule.ports)
+    main(m, ports=[clk, rst] + yourmodule.ports())
 ```
 
 ## 2. Resetless input signals
