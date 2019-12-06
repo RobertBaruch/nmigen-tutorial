@@ -4,7 +4,7 @@ A `Value` is a basic type. You can think of it as a literal value, but you gener
 
 ## Const
 
-A `Const` is a literal value, with a given number of bits, that does not change. 
+A `Const` is a literal value, with a given number of bits, that does not change.
 
 ## Shapes: widths and signedness
 
@@ -70,7 +70,7 @@ class Func(Enum):
 ...
 
 >>> x = Const(2, Func)
->>> x.shape()                                                                                                   Shape(width=3, signed=False)
+>>> x.shape()                                                                       Shape(width=3, signed=False)
 ```
 
 This is the equivalent of finding the minimum and maximum value of the enum, and then using that as the range for the constant. In the example above, it would be the same as `Const(2, range(0, 5))`.
@@ -101,17 +101,17 @@ True
 
 Again, note that `signed(4)` gives you a 4-bit 2's complement signal which can represent anything from -8 to +7. If you meant to get a Signal that is 4 bits plus a sign in order to represent -16 to +15, then you need `signed(5)`.
 
-### Signal.range
+### Signal from range
 
-`Signal.range(11)` creates an unsigned signal large enough to hold any integer between 0 and 10 inclusive, which in Python is `range(11)`. As with `Const`, if the range contains a negative number, the resulting signal will be signed:
+`Signal(range(11))` creates an unsigned signal large enough to hold any integer between 0 and 10 inclusive, which in Python is `range(11)`. As with `Const`, if the range contains a negative number, the resulting signal will be signed:
 
 ```python
->>> x = Signal.range(-5, 11)
+>>> x = Signal(range(-5, 11))
 >>> x.shape()
 Shape(width=5, signed=True)
 ```
 
-### Signal.enum
+### Signal from enum
 
 Given a Python enum with all integer values, you can create a signal out of it:
 
@@ -128,7 +128,7 @@ class Func(Enum):
 
 ...
 
-x = Signal.enum(Func)
+x = Signal(Func)
 ```
 
 Again, as with `Const`, this is the equivalent of finding the minimum and maximum value of the enum, and then using that as the range for the signal. In the example above, it would be the same as `Signal.range(0, 5)`.

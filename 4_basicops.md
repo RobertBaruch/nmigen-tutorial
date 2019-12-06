@@ -48,13 +48,13 @@ The same happens when adding two 5-bit 2's complement signals. The range of each
 
 ## Multiplexing signals
 
-`Mux` returns one signal if the condition is true, the other signal otherwise:
+`Mux` returns one signal if the condition is true, the other signal otherwise. It is the equivalent of the ternary operator than many languages have, but Python does not:
 
 ```python
 y.eq(Mux(cond, x1, x2))
 ```
 
-In this case, if `cond` is true then `y` is set to `x1`, otherwise `x2`.
+In this case, if `cond` is true then `y` is set to `x1`, otherwise `x2`. In other languages, this would be `cond ? x1 : x2`.
 
 `Mux` cannot be used on the left-hand side of an assignment.
 
@@ -96,7 +96,7 @@ m.d.comb += x.eq(y+2)
 
 In this case, `x` will get `y+2`.
 
-Remember that a signal cannot be set in two different domains so this will result in an error:
+Remember that a signal cannot be set in two different domains so this will result in a driver-driver conflict:
 
 ```python
 m.d.comb += x.eq(y+1)

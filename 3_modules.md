@@ -4,12 +4,13 @@
 
 ```python
 from nmigen import *
+from nmigen.build import Platform
 
 class ThingBlock(Elaboratable):
     def __init__(self):
         pass
 
-    def elaborate(self, platform: str):
+    def elaborate(self, platform: Platform) -> Module:
         m = Module()
         return m
 ```
@@ -31,15 +32,17 @@ if __name__ == "__main__":
     main(m, ports=[sync.clk, sync.rst])
 ```
 
-* `main(module, ports=[<ports>], platform="<platform>")` translates the given module, including any submodules recursively, in either Verilog or RTLIL. This is called _elaboration_. All `elaborate()` methods will have its `platform` argument set to the given `platform`. Elaboratables might create different logic for different platforms.
+* `main(module, ports=[<ports>], platform="<platform>")` translates the given module, including any submodules recursively, in either Verilog or RTLIL. This is called _elaboration_. All `elaborate()` methods will have its `platform` argument set to the given `platform`, which can be `None`, or a `Platform` representing a particular chip or development board. Elaboratables might create different logic for different platforms, and they can directly access chip pins via the platform.
 
 ```
-python3 thing.py generate -t [v|il]
+python3 thing.py generate -t [v|il] > thing.[v|il]
 ```
+
+Generating a module results in a single file which includes all submodules.
 
 ## Domains
 
-A _domain_, in its basic definition, is a grouping of logic elements. If we consider a module as a black box with inputs and outputs, then any given output is generated within one and only one domain. If you attempt to set an output in more than one domain, you'll get an error during elaboration that the signal has more than one driver.
+A _domain_, in its basic definition, is a grouping of logic elements. If we consider a module as a black box with inputs and outputs, then any given output is generated within one and only one domain. If you attempt to set an output in more than one domain, you'll get an error during elaboration that the signal has more than one driver -- a "driver-driver conflict".
 
 `Modules` come with two domains built in: a combinatorial domain and a synchronous domain.
 
@@ -51,9 +54,9 @@ Logic that contains no clocked elements is called _combinatorial_: it just combi
 
 ### Synchronous
 
-Synchronous logic is called synchronous because all of the flipflops (FFs) within a particular clock domain all change, in synchrony, according to the clock domain's clock. Each clock domain also has a reset signal which can reset all FFs to a given state. Finally, the domain specifies the edge on which all the FFs change: positive or negative.
+Logic that contains clocked elements is called _synchronous_ because all of the flip-flops (FFs) within a particular clock domain all change, in synchrony, according to the clock domain's clock. Each clock domain also has a reset signal which can reset all FFs to a given state. Finally, the domain specifies the edge of its clock on which all the FFs change: positive or negative.
 
-FFs that are not clocked using the edge of a given clock domain cannot be in that clock domain. By definition, they have a different clock and reset, and so belong in a different clock domain.
+FFs that are not clocked using the edge of a given clock domain cannot be in that clock domain. By definition, they have a different clock and reset, and so belong in a different clock domain. Attempts to set a signal in two clock domains will result in a driver-driver conflict.
 
 Some hardware supports only one clock domain. Many FPGAs support at least two clock domains.
 
@@ -65,9 +68,9 @@ There is no reason to create combinatorial domains. As mentioned above, modules 
 
 You can create a synchronous clock domain using `ClockDomain("<domain-name>", clk_edge="<pos|neg>")`. This gives you both the clock and the reset signal for the domain. By default, the domain name is `sync` and the clock edge is `pos`.
 
-You can access a domain via its name. So a domain created via `ClockDomain("other_stuff")` is accessed via `m.d.other_stuff`.
+You can access a domain via its name. So a domain created via `ClockDomain("myclk")` is accessed via `m.d.myclk`.
 
-You can access this domain's clock via `m.d.other_stuff.clk` and you can access its reset signal via `m.d.other_stuff.rst`.
+You can access this domain's clock via `m.d.myclk.clk` and you can access its reset signal via `m.d.myclk.rst`.
 
 You can also get the clock and reset signals without access to the domain:
 
@@ -97,7 +100,7 @@ m.domains += pos
 m.domains.neg = neg # Important!
 ```
 
-That last statement overrides the key for the domain in the module's `d` dictionary. Instead of the key being `pos`, which would simply overwrite the previous addition, we explicitly set the key to `neg`. Another way of accomplishing this is to use an unrelated name for the clocks:
+That last statement overrides the key for the domain in the module's `d` dictionary. By default, the dictionary key for a domain is its name. So, instead of the key being `pos`, which would overwrite the previous addition, we explicitly set the key to `neg`. Another way of accomplishing this is to use an unrelated name for the clocks:
 
 ```python
 pos = ClockDomain("clk")
@@ -109,7 +112,7 @@ m.domains.neg = neg
 
 ### Access to domains
 
-As stated above, a module can access its domains via its `d` attribute. By default, if a synchronous domain is added to a module's `domains` attribute, then all modules everywhere will also have access to that domain via their `d` attribute, even if that module is not a submodule of the module where the domain was added
+As stated above, a module can access its domains via its `d` attribute. By default, if a synchronous domain is added to a module's `domains` attribute, then all modules everywhere will also have access to that domain via their `d` attribute, even if that module is not a submodule of the module where the domain was added.
 
 You can explicitly inhibit this global propagation by setting the `local` named parameter of the `ClockDomain` to `True`. This forces the clock to only be present in the domain of the module it was added to, and all submodules of that module.
 

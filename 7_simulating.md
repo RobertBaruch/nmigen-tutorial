@@ -1,5 +1,7 @@
 # Simulating
 
+**Note**: nMigen has fixed the major issues with its simulator, so this section will soon be rewritten. You can still follow it, though.
+
 The best way to simulate a module is through the use of yosys. In brief:
 
 1. Create a top-level module with your module to simulate as a submodule. The top-level module should define one or more local `clk` signals, a local `rst` signal, and your clock domains whose clocks and resets are referenced to the local `clk` and `rst` signals. The local reset signal should be declared `reset_less`.

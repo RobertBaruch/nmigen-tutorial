@@ -46,6 +46,27 @@ with m.Switch(expression):
         statements3
 ```
 
+A `Case` can also have multiple values:
+
+```python
+with m.Switch(expression):
+    with m.Case(value1, value2):
+        statements1
+    with m.Case(value3, value4, value5, value6):
+        statements2
+```
+
+You can leave out the `Default` case if you don't want to change any signals in the default case:
+
+```python
+m.d.comb += x.eq(1)
+with m.Switch(y):
+    with m.Case(0, 1, 2):
+        m.d.comb += x.eq(2)
+```
+
+In the above example, if `y` is 0, 1, or 2, then `x` is assigned 2. Otherwise `x` retains its value of 1. Recall the section on overriding statements.
+
 ## Bit patterns
 
 The way to specify matching a pattern in a `Case` is with a Python string of binary digits. For example, `"0011101011"`. A don't-care bit is specified using a dash, so for example `"001---101"`. The number of bits in the string must exactly match the number of bits in the expression it is being compared to.
