@@ -12,7 +12,7 @@ But how does nMigen know how many bits the value has? If you simply construct a 
 
 You can specify that the value is signed, which affects things like magnitude comparisons. `a = Const(-10)` will automatically create a signed value. But `a = Const(10, signed(16))` explicitly creates a 16-bit signed value.
 
-Note that signed values are 2's complement values. `Const(-10)` is a _5-bit value_, because the minimum representation of `-10` in 2's complement is `11010`.
+Note that signed values are 2's complement values. `Const(-10)` is a _5-bit value_, because the minimum representation of `-10` in 2's complement is `10110`.
 
 You can also retrieve the shape of a `Const`:
 
