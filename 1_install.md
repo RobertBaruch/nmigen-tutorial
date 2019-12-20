@@ -5,7 +5,7 @@ Install:
 * Python:
   * https://blog.smallsec.ca/2017/09/07/installing-python3-6-on-wsl/
   * sudo -H pip3 install --upgrade pip
-  * sudo apt install python3.6-dev 
+  * sudo apt install python3.6-dev
 
 * yosys, Symbiyosys, yices2, boolector
 
@@ -14,6 +14,11 @@ Follow the [instructions to install these](https://symbiyosys.readthedocs.io/en/
 * nMigen
   * pip3 install --user git+https://github.com/m-labs/nmigen.git
 
-* For simulation
-  * [gtkwave](https://sourceforge.net/projects/gtkwave/)
-  
+* Signal viewer for simulation and formal verification
+  * [gtkwave](https://sourceforge.net/projects/gtkwave/) (for WSL, get the Windows version unless you want to run an [X server](https://askubuntu.com/questions/993225/whats-the-easiest-way-to-run-gui-apps-on-windows-subsystem-for-linux-as-of-2018))
+
+If you are planning to synthesize for an FPGA using open source tools, you need to install utilities for your chosen platform:
+*  [Lattice ice40 devices](http://www.clifford.at/icestorm/)
+*  [Lattice ECP5 devices](https://github.com/SymbiFlow/prjtrellis)
+
+This tutorial does not cover using these tools, but it does cover using nMigen to generate output for these tools.
