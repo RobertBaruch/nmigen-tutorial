@@ -17,18 +17,19 @@ However, many math operators are overridable in Python, since these translate to
 | `*`      | multiplication           |
 | `%`      | modulus                  |
 | `//`     | division                 | Integer division, rounding down. |
-| `<<`     | shift right              |
-| `>>`     | shift left               | Logical, not arithmetic          |
+| `<<`     | shift left               |
+| `>>`     | shift right              | Logical, not arithmetic          |
 | `&`      | bitwise and              |
 | `\|`     | bitwise or               |
 | `^`      | bitwise xor              |
 | `==`     | equality                 |
+| '!='     | inequality               |
 | `>`      | greater than             |
 | `>=`     | greater than or equal to |
 | `<`      | less than                |
 | `<=`     | less than or equal to    |
 
-Note that there are no translatable Python logical operators (`and`, `or`). Attempts to use an nMigen value as a boolean will result in an error saying `Attempted to convert nMigen value to boolean`.
+Note that there are no translatable Python logical operators (`and`, `or`). The logical reduction functions `any` and `all` are also not avaiable in nMigen expressions.  Attempts to use an nMigen value as a boolean will result in an error saying `Attempted to convert nMigen value to boolean`.
 
 ### Effects of operations on result width
 
@@ -48,13 +49,13 @@ The same happens when adding two 5-bit 2's complement signals. The range of each
 
 ## Multiplexing signals
 
-`Mux` returns one signal if the condition is true, the other signal otherwise. It is the equivalent of the ternary operator than many languages have, but Python does not:
+`Mux` returns one signal if the condition is true, the other signal otherwise:
 
 ```python
 y.eq(Mux(cond, x1, x2))
 ```
 
-In this case, if `cond` is true then `y` is set to `x1`, otherwise `x2`. In other languages, this would be `cond ? x1 : x2`.
+In this case, if `cond` is true then `y` is set to `x1`, otherwise `x2`.  It is the equivalent of Python's conditional expression `x1 if cond else x2` or other languages' `cond ? x1 : x2`.
 
 `Mux` cannot be used on the left-hand side of an assignment.
 
