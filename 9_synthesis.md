@@ -1,12 +1,83 @@
 # Coming soon
 
-## Supported devices
+# Supported devices
 
-See the [vendor directory](https://github.com/m-labs/nmigen/tree/master/nmigen/vendor) for supported devices.
+See the [vendor directory](https://github.com/m-labs/nmigen/tree/master/nmigen/vendor) for supported devices and toolchain details.
 
-## Defining your board
+Devices supported as of 20 Dec 2019:
 
-Example for the Lattice ice40-HX8K breakout board. Many more examples are at [nmigen_boards](https://github.com/m-labs/nmigen-boards/tree/master/nmigen_boards).
+| Device            | Platform classname        | Toolchain required |
+| ----------------- | ------------------------- | ------------------ |
+| Intel             | IntelPlatform             | Quartus            |
+| Lattice ECP5      | LatticeECP5Platform       | Trellis            |
+| Lattice ICE40     | LatticeICE40Platform      | IceStorm/iCECube2  |
+| Lattice MachXO2   | LatticeMachXO2Platform    | Diamond            |
+| Xilinx 7 series   | Xilinx7SeriesPlatform     | Vivado             |
+| Xilinx Spartan 3A | XilinxSpartan3Or6Platform | ISE                |
+| Xilinx Spartan 6  | XilinxSpartan3Or6Platform | ISE                |
+| Xilinx UltraScale | XilinxUltraScalePlatform  | Vivado             |
+
+
+# Defining your board
+
+Many boards are defined for you at [nmigen_boards](https://github.com/m-labs/nmigen-boards/tree/master/nmigen_boards).
+
+You can copy one from there and modify it to suit your needs, or create a new class subclassed from one of the above supported device platform classes.
+
+## Class properties
+
+* `device`: a string. See the base platform class for which one to choose. This affects options passed to the toolchain so that it compiles for the correct chip.
+* `package`: a string. See the base platform class for which one to choose. This affects options passed to the toolchain so that it compiles for the correct package of the chip.
+* `resources`: a list of `Resource`. This names the pins you want to use, and configuration options for each such pin.
+* `default_clk`: the name of the resource that is the clock for the default clock domain.
+* `defualt_rst`: the name of the resource that is the reset for the default clock domain.
+* `connectors`: optional, a list of `Connector`. It isn't obvious what purpose this serves. It may have something to do with certain toolchains.
+
+## Resources
+
+A `Resource` is a structure that contains a name, a number, and one or more configuration items for the resource. Adding a `Resource` to a board does two things:
+* configures pins on the device
+* allows you to request a resource's `Pin` by name from the platform in your `elaborate` function. Such a `Pin` has several `Signal` associated with it, such as `i` for input and `o` for output, which you can then use in your module.
+
+For example, by including this `Resource` into the platform's `resources` list:
+
+```python
+    Resource("abc", 0, Pins("J3", dir="i"))
+```
+
+then pin `J3` on the device will be configured as an input, and you can request the `abc` resource's input `Signal` like this:
+
+```python
+    platform.request("abc").i
+```
+
+### Resource configuration items
+
+* `Pins`: specifies the space-separated pin names associated with the resource, their direction type, and whether the signal should be automatically inverted when crossing the pin (for, e.g., active low signals). Direction types are:
+  * `i`: input only. Signal for the pin is `.i`
+  * `o`: output only. Signal for the pin is `.o`
+  * `io`: bidirectional. Signals for the pin are `.i` for the input, `.o` for the output, and `.oe` is the direction for the pin: 0 for input, 1 for output
+  * `oe`: tristate. Signals for the pin are `.o` for the output, and `.oe` to enable output: 0 for disable, 1 for enable
+
+* `PinsN`: shorthand for `Pins`, where all pins are active low.
+
+* `DiffPairs`: specifies the space-separated pin names for one or more differential pairs (positive and negative pins)
+
+* `Clock`: specifies that the resource is a clock with the given frequency in Hz.
+
+* `Attrs`: platform-specific attributes such as voltage standard to select.
+
+A full resource specification for a clock pin used on a Lattice ICE40 board could be as follows:
+
+```python
+    Resource("clk", 0, Pins("J3", dir="i"), Clock(12e6), Attrs(GLOBAL=True, IO_STANDARD="SB_LVCMOS"))
+```
+
+This says that the `clk` resource is at pin `J3` on the FPGA, has a frequency of 12MHz, is a "global" signal, and uses the LVCMOS voltage standard. Without knowing about the toolchain for the platform, you will not know what attributes are required.
+
+## Example
+
+Example for the Lattice ICE40-HX8K breakout board.
 
 ```python
 from nmigen.build import Platform, Resource, Pins, Clock, Attrs, Connector
@@ -75,7 +146,7 @@ if __name__ == "__main__":
     ICE40HX8KBEVNPlatform().build(Blinker(), do_program=True)  # Set to False on WSL!
 ```
 
-## Building
+# Building
 
 ```
 $ python3 file.py
@@ -87,3 +158,12 @@ This will result in a directory, `build`, containing the output files:
 * `top.bin`: The bitstream to send to the device (e.g. via iceprog)
 * `top.rpt`: Statistics from nextpnr. The most useful is the cell and LUT count at the end.
 * `top.tim`: Timing analysis. Shows how fast you can go. Probably.
+
+# Appendix: Known Lattice ICE40 attributes
+
+* `GLOBAL`: bool. If True, the pin is global. Global pins are designated `GBIN` in the datasheet pin listing.
+* `IO_STANDARD`: string:
+  * `SB_LVCMOS`: for all single-ended pins and differential output pins
+  * `SB_LVDS_INPUT`: for differential input pins
+
+Other attributes may be supported, but are not documented.
