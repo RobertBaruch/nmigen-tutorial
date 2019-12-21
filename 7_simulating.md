@@ -141,7 +141,20 @@ there will be one clock edge that always takes place before the process runs. Th
 
 ### Passive and active processes
 
-This section is delayed until I can understand what these are.
+Processes may be passive or active. When an *active* process runs out of things to tell the simulator to do, it asks the simulator to finish. In effect, it controls the endpoint of the simulator. The simulation ends when all active processes are done. A *passive* process, on the other hand, doesn't ask the simulator to finish.
+
+By default, processes added with `add_process` and `add_sync_process` are active. A process can change its mode using `yield Active()` or `yield Passive()`.
+
+## Ending the simulation
+
+As mentioned above, the simulation ends when all active processes are done. This is how `sim.run()` works.
+
+However, you can instead use `sim.run_until()`, which lets you end the simulation at a particular time. The `run_passive` key is `False` by default, meaning that the simulation will also end if all active processes are done. This behavior can be changed by setting `run_passive` to `True`, in which case the simulation will only end once the specified time is reached. For example, the following will run the simulation for 100 microseconds and then stop, regardless of whether the active processes are done:
+
+```python
+    with sim.write_vcd("test.vcd", "test.gtkw", traces=yourmodule.ports()):
+        sim.run_until(100e-6, run_passive=True)
+```
 
 ## Running the simulation and viewing the output
 
