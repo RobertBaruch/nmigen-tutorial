@@ -47,12 +47,12 @@ if __name__ == "__main__":
 
 ## Define your clocks, if any
 
-If you have clocks, add each clock after the `Simulator` construction, giving the clock period in seconds. For example, a 1MHz clock for clock domain `fast_clock` and a 1.1MHz clock for `faster_clock` would be:
+If you have clocks, add each clock after the `Simulator` construction, giving the clock period in seconds. For example, a 1MHz clock for clock domain `fast_clock` and a (nearly) 1.1MHz clock for `faster_clock` would be:
 
 ```python
    sim = Simulator(m)
    sim.add_clock(1e-6, domain="fast_clock")
-   sim.add_clock(1.1e-6, domain="faster_clock")
+   sim.add_clock(0.91e-6, domain="faster_clock")
 ```
 
 Leaving out `domain` will cause the clock period to be assigned to the default clock domain, `sync`.
@@ -94,7 +94,7 @@ You can even have more than one process running at a time!
         yield Settle()
 
     def y_process():
-        yield Delay(1.1e-6)
+        yield Delay(1.2e-6)
         yield y.eq(0xFF)
         yield Settle()
 
@@ -102,7 +102,7 @@ You can even have more than one process running at a time!
     sim.add_process(y_process)
 ```
 
-In the above example, `x` will be set to 0 at time 1 microsecond, and `y` will be set to 0xFF at time 1.1 microseconds.
+In the above example, `x` will be set to 0 at time 1 microsecond, and `y` will be set to 0xFF at time 1.2 microseconds.
 
 **Warning**: driving the same signal from more than one process can lead to undefined behavior if both processes assign to the signal simultaneously.
 
