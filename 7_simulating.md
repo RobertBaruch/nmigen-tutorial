@@ -106,26 +106,24 @@ In the above example, `x` will be set to 0 at time 1 microsecond, and `y` will b
 
 **Warning**: driving the same signal from more than one process can lead to undefined behavior if both processes assign to the signal simultaneously.
 
-### Non-clocked processes
+### Non-synchronous processes
 
-If your module doesn't use a clock, then you can create a non-clocking `process`. You must add such a process to the simulator via `add_process`:
+If you want to specify exactly when signals change based on time, then you can create a non-synchronous `process`. You must add such a process to the simulator via `add_process`:
 
 ```python
     sim.add_process(process)
 ```
 
-Then you must manipulate all the input signals for yourself.
+### Synchronous processes
 
-### Clocked processes
-
-If your module has one or more clocks, then you can create a clocking `process`. For each clock domain, you must add such a process to the simulator via `add_sync_process`:
+If you want to specify when signals change based on clock edges, then you can create a synchronous `process`. You can add such a process to the simulator via `add_sync_process`, specifying the clock domain it should be clocked from:
 
 ```python
     sim.add_sync_process(process1, domain="name1")
     sim.add_sync_process(process2, domain="name2")
 ```
 
-If you `yield` with no value from a clocking process, then one cycle of the clock will occur. Note that for clocked processes, one clock edge will always occur before the process starts, so take that into account when you look at your traces.
+If you `yield` with no value from a synchronous process, then the process will wait for the next clock edge. Note that for synchronous processes, one clock edge will always occur before the process starts, so take that into account when you look at your traces.
 
 It is also important to understand when statements are executed in relation to clock edges. They are always executed **infinitesimally after** the previous clock edge. Thus, in this example:
 
