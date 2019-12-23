@@ -23,13 +23,14 @@
 If you are planning to synthesize for an FPGA using open source tools, you need to install utilities for your chosen platform:
 
 * [Lattice ice40 devices](http://www.clifford.at/icestorm/)
-  * `sudo apt-get install libeigen3-dev`
-  * Follow the given instructions for installing icestorm and NextPNR.
+  * Install this prerequisite that is not in the instructions: `sudo apt-get install libeigen3-dev`
+  * Install the other prerequisites as in the instructions.
   * Holy Odin, g++-8.3.0 that was installed on WSL **coredumps** when compiling icestorm. Le sigh.
     * `sudo apt-get install g++-7 gcc-7`
     * `sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-8 60 --slave /usr/bin/g++ g++ /usr/bin/g++-8`
     * `sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 50 --slave /usr/bin/g++ g++ /usr/bin/g++-7`
     * Switch to g++-7 before compiling icestorm: `sudo update-alternatives --config gcc`
+  * **Now** follow the given instructions for installing icestorm and NextPNR.
   * For WSL, you will also need the Windows version of iceprog.exe, which is inside a zip file from [FPGAWars' toolchain-icestorm repository](https://github.com/FPGAwars/toolchain-icestorm/releases).
 
 * [Lattice ECP5 devices](https://github.com/SymbiFlow/prjtrellis)
