@@ -11,7 +11,9 @@
   * Now follow the [instructions to install these](https://symbiyosys.readthedocs.io/en/latest/quickstart.html). It is highly recommended to follow those instructions, especially for yosys since the git repo has many more fixes than the official release.
 
 * nMigen
-  * `pip3 install --user git+https://github.com/m-labs/nmigen.git`
+  * Change to your virtual environment! (see below)
+  * `pip3 install wheel`
+  * `pip3 install git+https://github.com/m-labs/nmigen.git`
 
 * Signal viewer for simulation and formal verification
   * [gtkwave](https://sourceforge.net/projects/gtkwave/) (for WSL, get the Windows version unless you want to run an [X server](https://askubuntu.com/questions/993225/whats-the-easiest-way-to-run-gui-apps-on-windows-subsystem-for-linux-as-of-2018))
