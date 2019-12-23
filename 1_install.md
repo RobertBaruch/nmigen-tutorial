@@ -23,6 +23,8 @@
 If you are planning to synthesize for an FPGA using open source tools, you need to install utilities for your chosen platform:
 
 * [Lattice ice40 devices](http://www.clifford.at/icestorm/)
+  * Follow the given instructions for installing icestorm and NextPNR.
+  * For WSL, you will also need the Windows version of iceprog.exe, which is inside a zip file from [FPGAWars' toolchain-icestorm repository](https://github.com/FPGAwars/toolchain-icestorm/releases).
 * [Lattice ECP5 devices](https://github.com/SymbiFlow/prjtrellis)
 
 This tutorial does not cover using these tools, but it does cover using nMigen to generate output for these tools.
