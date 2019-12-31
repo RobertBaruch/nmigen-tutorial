@@ -1,6 +1,6 @@
 # Install
 
-(For windows users, use [WSL](https://docs.microsoft.com/en-us/windows/wsl/install-win10), I recommend Debian as a distro)
+(For windows users, use [WSL](https://docs.microsoft.com/en-us/windows/wsl/install-win10), I recommend Ubuntu as a distro)
 
 > It's unfortunate that installation of everything you need isn't a one-click process... although [FPGAWars' Apio](http://fpgawars.github.io/) goes a long way towards doing this. I just think that while yosys and nMigen are undergoing constant positive updates, Apio doesn't keep up with them. In the meantime, we just install all the tools separately.
 
@@ -32,6 +32,7 @@ If you are planning to synthesize for an FPGA using open source tools, you need 
     * Switch to g++-7 before compiling icestorm: `sudo update-alternatives --config gcc`
   * **Now** follow the given instructions for installing icestorm and NextPNR.
   * For WSL, you will also need the Windows version of iceprog.exe, which is inside a zip file from [FPGAWars' toolchain-icestorm repository](https://github.com/FPGAwars/toolchain-icestorm/releases).
+  * For Debian on WSL, you need to "fix" libQt5Core.so.5: `sudo strip --remove-section=.note.ABI-tag /usr/lib/x86_64-linux-gnu/libQt5Core.so.5`. See [bug](https://github.com/Microsoft/WSL/issues/3023). So... use Ubuntu for WSL instead?
 
 * [Lattice ECP5 devices](https://github.com/SymbiFlow/prjtrellis)
 
