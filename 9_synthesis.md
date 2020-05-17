@@ -30,7 +30,7 @@ You can copy one from there and modify it to suit your needs, or create a new cl
 * `package`: a string. See the base platform class for which one to choose. This affects options passed to the toolchain so that it compiles for the correct package of the chip.
 * `resources`: a list of `Resource`. This names the pins you want to use, and configuration options for each such pin.
 * `default_clk`: the name of the resource that is the clock for the default clock domain.
-* `defualt_rst`: the name of the resource that is the reset for the default clock domain.
+* `default_rst`: the name of the resource that is the reset for the default clock domain.
 * `connectors`: optional, a list of `Connector`. It isn't obvious what purpose this serves. It may have something to do with certain toolchains.
 
 ## Resources
