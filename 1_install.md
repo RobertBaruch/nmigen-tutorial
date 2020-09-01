@@ -13,7 +13,7 @@
 * nMigen
   * Change to your virtual environment! (see below)
   * `pip3 install wheel`
-  * `pip3 install git+https://github.com/m-labs/nmigen.git`
+  * `pip3 install git+https://github.com/nmigen/nmigen`
 
 * Signal viewer for simulation and formal verification
   * [gtkwave](https://sourceforge.net/projects/gtkwave/) (for WSL, get the Windows version unless you want to run an [X server](https://askubuntu.com/questions/993225/whats-the-easiest-way-to-run-gui-apps-on-windows-subsystem-for-linux-as-of-2018))
