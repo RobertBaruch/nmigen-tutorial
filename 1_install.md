@@ -61,3 +61,13 @@ sudo apt install python3-pip build-essential libssl-dev libffi-dev
 ```
 
 In installing the yosys prerequisites, Python 2 will be installed. So be aware that when you want to run anything under Python 3, you must use `python3` (or `pip3` for installing), not `python` (or `pip`).
+
+# Tip for vscode users:
+
+Open File > Preferences > Settings, look for pylint args, and add:
+
+```
+--contextmanager-decorators=contextlib.contextmanager,nmigen.hdl.dsl._guardedcontextmanager
+```
+
+This is because pylint doesn't recognize that `nmigen.hdl.dsl._guardedcontextmanager` is a valid context manager. Otherwise pylint will complain for every `with m.If` statement.
