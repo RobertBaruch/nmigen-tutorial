@@ -90,7 +90,15 @@ unsigned(3)
 
 This is the equivalent of finding the minimum and maximum value of the enum, and then using that as the range for the constant. In the example above, it would be the same as `Const(2, range(0, 5))`.
 
-The enumerated values of the enum can be used anywhere a `Const` can be used, so that `Func.SUB` is equivalent to `Const(2, range(0, 5))` or `Const(2, Func)`.
+You can also use this syntax, which might be better since you can use the enumerated value instead of the integer:
+
+```
+>>> x = Value.cast(Func.SUB)
+>>> x.shape()
+unsigned(3)
+```
+
+The enumerated values of the enum can be used anywhere a `Const` can be used, so that `Func.SUB` is equivalent to `Const(2, range(0, 5))` or `Const(2, Func)` or `Value.cast(Func.SUB)`.
 
 ## Signals
 
