@@ -18,7 +18,7 @@ However, many math operators are overridable in Python, since these translate to
 | `%`      | modulus                  |
 | `//`     | division                 | Integer division, rounding down. |
 | `<<`     | shift left               |
-| `>>`     | shift right              | Logical, not arithmetic          |
+| `>>`     | shift right              | Effectively arithmetic, see below. |
 | `&`      | bitwise and              |
 | `\|`     | bitwise or               |
 | `^`      | bitwise xor              |
@@ -30,6 +30,8 @@ However, many math operators are overridable in Python, since these translate to
 | `<=`     | less than or equal to    |
 
 Note that there are no translatable Python logical operators (`and`, `or`). The logical reduction functions `any` and `all` are also not avaiable in nMigen expressions.  Attempts to use an nMigen value as a boolean will result in an error saying `Attempted to convert nMigen value to boolean`.
+
+Shift right is effectively arithmetic, where the sign bit is present for signed Values, or absent (or implicitly zero) for unsigned Values. Consider that if right shift is applied to a signed Value, the shift properly duplicates the sign bit. If it is applied to an unsigned Value, the shift is logical -- you could consider it an arithmetic shift where the "missing" sign bit is always zero. Because shift right on an unsigned Value is the same as logical shift right, `>>` is a logical shift right when applied to an unsigned Value.
 
 ### Effects of operations on result width
 
