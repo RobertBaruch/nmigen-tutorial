@@ -8,7 +8,7 @@ For windows users, install [WSL](https://docs.microsoft.com/en-us/windows/wsl/in
 
 > It's unfortunate that installation of everything you need isn't a one-click process... although [FPGAWars' Apio](http://fpgawars.github.io/) goes a long way towards doing this. I just think that while yosys and nMigen are undergoing constant positive updates, Apio doesn't keep up with them. In the meantime, we just install all the tools separately.
 
-* Python: See below for Python 3.8 on WSL.
+* Python: See below for Python 3.6+ on WSL.
 
 * Install yosys, Symbiyosys, yices2, and z3.
   * `sudo apt install curl`
@@ -52,7 +52,7 @@ Python 2 and Python 3 are not compatible. This is why this happens:
 * `python`, `pip` -> Python 2
 * `python3`, `pip3` -> Python 3
 
-On my freshly-installed WSL, the only version present is Python 3.8. If it is not on your version, you will want to upgrade to 3.8. Upgrading is beyond the scope of this document.
+On my freshly-installed WSL, the only version present is Python 3.8. If it is not on your version, you may want to upgrade to 3.8, but 3.6+ will work. Upgrading is beyond the scope of this document.
 
 Now install some bare minimum tools:
 
