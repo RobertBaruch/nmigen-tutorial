@@ -28,7 +28,7 @@ If `platform` is `"this"` then only `statement1` will appear in the generated ha
 
 ### Conditions
 
-The conditions in `If-Elif-Else` are comparisons, for example `a == 1` or `(a >= b) & (a <= c)`. Note that in this latter example, we used parentheses around each term. Each comparison, in essense, becomes a one-bit signal, and `&` is a _bit-wise operator_, not the logical `and`. When in doubt, just use parentheses.
+The conditions in `If-Elif-Else` are comparisons, for example `a == 1` or `(a >= b) & (a <= c)`. Note that in this latter example, we used parentheses around each term. Each comparison, in essence, becomes a one-bit signal, and `&` is a _bit-wise operator_, not the logical `and`. When in doubt, just use parentheses.
 
 If you have a signal with more than one bit and use it as the condition, as in `with m.If(a):`, then the condition will be true if any bit in `a` is 1.
 
