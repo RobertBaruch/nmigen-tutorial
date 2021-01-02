@@ -137,7 +137,7 @@ m2.d.thing += # this will fail
 
 ## Ports
 
-The equivalent of ports in a module is public attributes. In the following example, `a` and `data` are publically available to other modules, while `b` is not, just as `a` and `data` are publically available to other Python classes, and `b` is not.
+The equivalent of ports in a module is public attributes. In the following example, `a` and `data` are publicly available to other modules, while `b` is not, just as `a` and `data` are publicly available to other Python classes, and `b` is not.
 
 ```python
 class ThingBlock(Elaboratable):

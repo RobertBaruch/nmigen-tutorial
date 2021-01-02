@@ -243,7 +243,7 @@ class BusLayout(Layout):
     def __init__(self):
         super().__init__([
             ("data", unsigned(8)),
-            ("addr", unsigned(16))
+            ("addr", unsigned(16)),
             ("wr", 1),
             ("en", 1),
         ])
