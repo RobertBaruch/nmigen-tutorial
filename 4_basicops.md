@@ -23,7 +23,7 @@ However, many math operators are overridable in Python, since these translate to
 | `\|`     | bitwise or               |
 | `^`      | bitwise xor              |
 | `==`     | equality                 |
-| '!='     | inequality               |
+| `!=`     | inequality               |
 | `>`      | greater than             |
 | `>=`     | greater than or equal to |
 | `<`      | less than                |
